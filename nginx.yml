@@ -1,0 +1,30 @@
+- name: Install Nginx and copy index.html
+  hosts: ubuntu
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: latest
+
+    - name: Copy Nginx config file
+      template:
+        src: /home/ubuntu/ansible/site.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: restart nginx
+
+    - name: Copy index.html file
+      copy:
+        src: index.html
+        dest: /var/www/html/
+
+  handlers:
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
